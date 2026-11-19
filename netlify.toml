@@ -1,0 +1,46 @@
+# ==============================================================================
+# NETLIFY DEPLOYMENT CONFIGURATION — RONALDIANS IN BENGAL
+# ==============================================================================
+
+[build]
+  publish = "."
+  functions = "netlify/functions"
+  command = "echo 'RFCU Static Site Ready for Netlify Deployment'"
+
+# Cache optimization for static assets
+[[headers]]
+  for = "/images/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=604800, must-revalidate"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=604800, must-revalidate"
+
+# Security Headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+# 1. API Route Redirect to Netlify Serverless Function
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/api/:splat"
+  status = 200
+
+# 2. Single Page Application (SPA) Fallback for client-side routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
